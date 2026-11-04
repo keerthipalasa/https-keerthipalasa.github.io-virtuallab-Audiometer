@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Audiometer Virtual Lab</title>
+<style>
+:root {
+  --site-primary:#147D78;
+  --site-on-primary:#FFFFFF;
+  --site-secondary:#7255C7;
+  --site-on-secondary:#FFFFFF;
+  --site-background:#F2F5FA;
+  --site-on-background:#182338;
+  --site-font-body:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --site-font-heading:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --site-heading-scale:1;
+  --site-spacing-scale:1;
+  --site-radius-scale:1;
+  --site-decoration-opacity:1;
+  color-scheme:light dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:var(--site-font-body);background:var(--site-background);color:var(--site-on-background);line-height:1.55}
+#app{min-height:100vh;width:100%;border-radius:0;background-color:var(--site-background);color:var(--site-on-background);overflow:hidden}
+h1,h2,h3{font-family:var(--site-font-heading);line-height:1.15}
+button,select,input{font:inherit}
+button{cursor:pointer}
+.shell{max-width:1220px;margin:auto;padding:calc(26px * var(--site-spacing-scale)) calc(22px * var(--site-spacing-scale))}
+.hero{position:relative;overflow:hidden;color:white;background:linear-gradient(120deg,#102B3F 0%,#126E70 55%,#6250A6 100%);padding:30px max(5vw,22px) 34px}
+.hero:before,.hero:after{content:"";position:absolute;border:1px solid #ffffff24;border-radius:50%;pointer-events:none;opacity:var(--site-decoration-opacity)}
+.hero:before{width:360px;height:360px;right:8%;top:-240px;box-shadow:0 0 0 35px #ffffff08,0 0 0 75px #ffffff06}
+.hero:after{width:190px;height:190px;right:22%;bottom:-150px;box-shadow:0 0 0 28px #ffffff0b}
+.hero-inner{max-width:1220px;margin:auto;position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:25px}
+.eyebrow{font-size:11px;letter-spacing:2.4px;font-weight:800;color:#B9F0E8;text-transform:uppercase}
+.hero h1{font-size:calc( clamp(30px,4.2vw,48px) * var(--site-heading-scale));margin:9px 0 8px;letter-spacing:-1.5px}
+.hero p{margin:0;color:#DCEFEF;max-width:640px}
+.hero-meta{display:flex;gap:9px;flex-wrap:wrap;margin-top:18px}
+.chip{font-size:12px;border:1px solid #ffffff45;background:#ffffff12;border-radius:30px;padding:6px 11px;color:#F2FFFF}
+.hero-art{width:220px;min-width:160px;filter:drop-shadow(0 15px 25px #061a3040);opacity:.95}
+.nav{position:sticky;top:0;z-index:5;background:light-dark(#FFFFFFE8,#172334E8);backdrop-filter:blur(14px);border-bottom:1px solid light-dark(#DCE4ED,#334155);display:flex;justify-content:center;gap:5px;padding:9px 12px;flex-wrap:wrap}
+.nav a{color:light-dark(#34445B,#E1E9F5);text-decoration:none;font-size:13px;font-weight:650;padding:8px 13px;border-radius:9px}
+.nav a:hover{background:color-mix(in srgb,var(--site-primary) 12%,transparent);color:var(--site-primary)}
+.section-title{font-size:calc(22px * var(--site-heading-scale));letter-spacing:-.5px;margin:0 0 13px;color:light-dark(#172B42,#F2F7FF)}
+.card{background:light-dark(#FFFFFF,#1B293A);border:1px solid light-dark(#DCE5EF,#344458);border-radius:calc(18px * var(--site-radius-scale));padding:calc(22px * var(--site-spacing-scale));box-shadow:0 8px 28px #172b4209;margin-bottom:18px}
+.card p{margin:8px 0}
+.muted{color:light-dark(#68778B,#A8B6C8)}
+.small{font-size:12px}
+.kicker{color:var(--site-primary);font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:7px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.info-tile{background:light-dark(#F5F8FC,#223247);border:1px solid light-dark(#E6ECF3,#35485E);border-radius:13px;padding:15px}
+.info-tile h3{font-size:15px;margin:0 0 6px;color:light-dark(#213750,#F2F7FF)}
+.info-tile p{font-size:13px;margin:0;color:light-dark(#617187,#B6C3D3)}
+.block-diagram{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px}
+.block{background:light-dark(#EAF4F4,#203F47);border:1px solid #2C9A8C55;border-radius:10px;padding:10px 12px;font-size:12px;font-weight:700;color:light-dark(#155B58,#B9F0E8);flex:1;text-align:center;min-width:110px}
+.arrow{color:var(--site-secondary);font-weight:900}
+.lab-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(330px,.95fr);gap:18px;align-items:start}
+.instrument{background:linear-gradient(145deg,#112D40,#1B3B50 60%,#29385C);border:1px solid #31566B;border-radius:18px;padding:18px;color:#F3FBFF;box-shadow:0 16px 35px #0c243426}
+.instrument-top{display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid #ffffff1c;padding-bottom:12px;margin-bottom:15px}
+.instrument-title{font-weight:800;letter-spacing:.3px}.live{font-size:10px;color:#9DE5D6;letter-spacing:1.2px}.live:before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:#43D6A4;margin-right:7px;box-shadow:0 0 10px #43D6A4}
+.instrument-screen{background:linear-gradient(140deg,#071C2B,#102B3D);border:1px solid #3B6676;border-radius:12px;padding:14px;margin-bottom:14px;position:relative;overflow:hidden}
+.screen-label{font-size:10px;color:#83B6C2;letter-spacing:1.5px;text-transform:uppercase}
+.screen-readouts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:7px 0 4px}
+.readout{background:#ffffff0a;border:1px solid #ffffff12;border-radius:9px;padding:9px}
+.readout strong{font-size:25px;display:block;color:#A8F0DF;letter-spacing:-1px}.readout span{font-size:10px;color:#A8C3D0}
+.wave{width:100%;height:65px;display:block;margin-top:6px}
+.control-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field label{font-size:11px;color:#B8CCD8;display:block;margin-bottom:6px;font-weight:700;letter-spacing:.4px}
+.instrument select{width:100%;padding:10px;border-radius:9px;border:1px solid #456176;background:#19374B;color:#F6FCFF;outline:none}
+.range-box{grid-column:1/-1;background:#17374B;border:1px solid #456176;border-radius:10px;padding:11px 12px}
+.range-head{display:flex;justify-content:space-between;font-size:12px;color:#D5E8EF}.range-head b{color:#9DE9DA}
+input[type=range]{width:100%;accent-color:#50D2B6;margin:12px 0 3px}
+.range-scale{display:flex;justify-content:space-between;color:#91AEBB;font-size:10px}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}
+.btn{border:1px solid #527085;background:#23465B;color:#EAF7FA;border-radius:9px;padding:10px 13px;font-size:12px;font-weight:750;flex:1}
+.btn.primary{background:linear-gradient(120deg,#159A8B,#287CC0);border-color:#2CB7A5;color:white;box-shadow:0 5px 14px #159a8b35}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.lab-status{min-height:52px;margin-top:12px;border:1px solid #416274;background:#0D2638;border-radius:10px;padding:11px 12px;color:#D9EDF1;font-size:12px}
+.patient-card{display:flex;align-items:center;gap:14px;background:light-dark(#F1F7FA,#213548);border:1px solid light-dark(#DCE9EF,#385267);border-radius:13px;padding:13px;margin-bottom:13px}
+.patient-icon{width:53px;height:53px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg,#D8F5EF,#E8E0FF);font-size:26px}
+.patient-card strong{display:block;font-size:13px}.patient-card span{font-size:11px;color:light-dark(#718096,#B5C5D4)}
+.guide-list{padding:0;margin:0;list-style:none;counter-reset:steps}
+.guide-list li{counter-increment:steps;display:flex;gap:12px;padding:10px 0;border-bottom:1px solid light-dark(#E9EEF4,#334458);font-size:13px}
+.guide-list li:before{content:counter(steps);flex:0 0 26px;height:26px;display:grid;place-items:center;border-radius:8px;background:color-mix(in srgb,var(--site-secondary) 13%,transparent);color:var(--site-secondary);font-weight:800}
+.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:12px;min-width:440px}th,td{text-align:center;padding:11px 8px;border-bottom:1px solid light-dark(#E8EDF3,#354458)}th{color:light-dark(#6C7A8D,#AAB8C9);font-size:10px;letter-spacing:1px;text-transform:uppercase}td{color:light-dark(#28384D,#E2EAF3)}
+.graph-shell{background:light-dark(#FBFCFE,#152334);border:1px solid light-dark(#E4EAF1,#34465A);border-radius:14px;padding:10px 12px}
+canvas#audiogram{width:100%;height:310px;display:block}
+.legend{display:flex;gap:15px;flex-wrap:wrap;font-size:11px;color:light-dark(#65758A,#B8C5D3);padding:8px 3px 2px}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}
+.result-band{background:linear-gradient(110deg,color-mix(in srgb,var(--site-primary) 12%,transparent),color-mix(in srgb,var(--site-secondary) 10%,transparent));border:1px solid color-mix(in srgb,var(--site-primary) 23%,transparent);border-radius:13px;padding:16px}
+.notice{border-left:4px solid #D79B35;background:light-dark(#FFF8E9,#3B3020);padding:12px 14px;border-radius:8px;font-size:12px;color:light-dark(#70521F,#F2D9A6)}
+footer{background:light-dark(#E8EEF4,#111E2D);padding:23px;text-align:center;color:light-dark(#718096,#AAB8C8);font-size:11px}
+@media(max-width:850px){.lab-grid{grid-template-columns:1fr}.hero-art{width:165px}}
+@media(max-width:600px){.hero-inner{align-items:flex-start}.hero-art{width:105px;min-width:90px}.grid{grid-template-columns:1fr}.shell{padding:18px 13px}.card{padding:17px}.nav{justify-content:flex-start;overflow:auto;flex-wrap:nowrap}.nav a{white-space:nowrap}.control-grid{grid-template-columns:1fr 1fr}}
+@media(prefers-color-scheme:dark){.section-title{color:#F2F7FF}}
+</style>
+</head>
+<body>
+<div id="app">
+<header class="hero"><div class="hero-inner"><div><div class="eyebrow">Virtual Biomedical Laboratory · Experiment 05</div><h1>Recording of Audiogram</h1><p>Explore hearing assessment through an interactive pure-tone audiometer simulation. Test air and bone conduction, record thresholds, and build an audiogram.</p><div class="hero-meta"><span class="chip">Interactive experiment</span><span class="chip">Air + Bone conduction</span><span class="chip">Audiogram plotting</span></div></div>
+<svg class="hero-art" viewBox="0 0 240 210" role="img" aria-label="Decorative illustration of an ear and sound waves"><defs><linearGradient id="earGrad" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#8CE2D2"/><stop offset="1" stop-color="#B6A4F3"/></linearGradient></defs><path d="M126 27C78 10 40 42 43 91c2 31 25 44 31 67 5 18 16 29 34 26 18-3 19-22 29-35 9-12 27-17 33-39 12-43-8-71-44-83Z" fill="url(#earGrad)" opacity=".95"/><path d="M121 58c-28-10-50 8-49 34 1 19 17 25 25 40 8 16 5 31 18 32 13 1 14-15 20-24 8-12 21-17 24-34 4-23-12-42-38-48Z" fill="#163C52"/><path d="M111 82c-16-5-27 6-24 20 2 9 13 14 17 24 4 10 1 19 10 20 8 1 10-10 14-16 6-8 14-12 14-23 0-14-12-22-31-25Z" fill="none" stroke="#8CE2D2" stroke-width="6" stroke-linecap="round"/><path d="M160 75c22 4 34 18 36 37M169 58c34 6 52 28 55 59M175 42c44 8 65 39 68 81" fill="none" stroke="#D4C8FF" stroke-width="4" stroke-linecap="round" opacity=".85"/><circle cx="114" cy="115" r="6" fill="#E9FFFF"/></svg></div></header>
+<nav class="nav"><a href="#overview">Overview</a><a href="#theory">Theory</a><a href="#experiment">Virtual experiment</a><a href="#readings">Readings</a><a href="#audiogram-section">Audiogram</a><a href="#procedure">Procedure</a></nav>
+<main class="shell">
+<section class="card" id="overview"><div class="kicker">01 / Start here</div><h2 class="section-title">Experiment overview</h2><div class="grid"><div class="info-tile"><h3>🎯 Aim</h3><p>To measure pure tone air conduction and study bone conduction thresholds of hearing using an audiometer.</p></div><div class="info-tile"><h3>🧰 Equipment required</h3><p>Audiometer – 1 · Headphones – 1. A bone vibrator is used for the bone conduction demonstration.</p></div><div class="info-tile"><h3>Learning objectives</h3><p>Understand conduction pathways, adjust frequency and intensity, estimate hearing thresholds, and plot an audiogram.</p></div><div class="info-tile"><h3>Test range</h3><p>Air conduction: 250–8000 Hz. Bone conduction: up to 4000 Hz in this experiment.</p></div></div></section>
+<section class="card" id="theory"><div class="kicker">02 / Background</div><h2 class="section-title">Theory of audiometry</h2><p class="muted">An audiometer measures hearing sensitivity by presenting tones at different frequencies and intensities. The threshold is the lowest sound level at which the subject can hear the tone.</p><div class="grid" style="margin-top:14px"><div class="info-tile"><h3>Air conduction (AC)</h3><p>Sound travels through the external ear and middle ear to the inner ear. Headphones deliver the test tone.</p></div><div class="info-tile"><h3>Bone conduction (BC)</h3><p>Mechanical vibrations of the skull bones and soft tissues transmit sound to the inner ear. A bone vibrator is used.</p></div></div><h3 style="font-size:14px;margin:19px 0 7px">Basic audiometer signal path</h3><div class="block-diagram"><div class="block">Tone generator</div><span class="arrow">→</span><div class="block">Equalization</div><span class="arrow">→</span><div class="block">Attenuator</div><span class="arrow">→</span><div class="block">Power amplifier</div><span class="arrow">→</span><div class="block">Test ear</div></div><p class="small muted" style="margin-top:12px">A separate noise-generator channel can provide masking noise to the non-test ear.</p></section>
+<section id="experiment"><div class="kicker">03 / Hands-on simulation</div><h2 class="section-title">Virtual audiometer console</h2><div class="lab-grid">
+<div class="instrument"><div class="instrument-top"><div><div class="instrument-title">AUDIO-TECH · AT-05</div><div class="small" style="color:#9ABAC8">PURE TONE AUDIOMETER</div></div><div class="live">SYSTEM READY</div></div>
+<div class="instrument-screen"><div class="screen-label">Live test parameters</div><div class="screen-readouts"><div class="readout"><strong id="freqDisplay">1000</strong><span>FREQUENCY · HZ</span></div><div class="readout"><strong id="levelDisplay">50</strong><span>INTENSITY · dB HL</span></div></div><svg class="wave" viewBox="0 0 500 65" preserveAspectRatio="none" aria-label="Illustrative tone waveform"><path d="M0 33H500" stroke="#426276" stroke-width="1" stroke-dasharray="4 6"/><path id="wavePath" d="M0 33 Q12 4 24 33 T48 33 T72 33 T96 33 T120 33 T144 33 T168 33 T192 33 T216 33 T240 33 T264 33 T288 33 T312 33 T336 33 T360 33 T384 33 T408 33 T432 33 T456 33 T480 33" fill="none" stroke="#72E2CB" stroke-width="2.5"/></svg></div>
+<div class="control-grid"><div class="field"><label for="mode">CONDUCTION MODE</label><select id="mode"><option value="AC">Air conduction (AC)</option><option value="BC">Bone conduction (BC)</option></select></div><div class="field"><label for="ear">TEST EAR</label><select id="ear"><option>Right</option><option>Left</option></select></div><div class="field" style="grid-column:1/-1"><label for="frequency">TEST FREQUENCY</label><select id="frequency"><option>250</option><option>500</option><option selected>1000</option><option>2000</option><option>4000</option><option>8000</option></select></div><div class="range-box"><div class="range-head"><label for="intensity">TONE INTENSITY</label><b id="levelText">50 dB HL</b></div><input id="intensity" type="range" min="-10" max="100" step="5" value="50"><div class="range-scale"><span>−10 dB</span><span>100 dB</span></div></div></div>
+<div class="btn-row"><button class="btn" id="down">− 5 dB</button><button class="btn" id="up">+ 5 dB</button><button class="btn primary" id="play">▶ Present tone</button></div><div class="lab-status" id="status" aria-live="polite">Select the test settings, then present a tone.</div><div class="btn-row"><button class="btn primary" id="respond" disabled>✓ Patient heard tone</button><button class="btn" id="record" disabled>Save threshold</button><button class="btn" id="next">Next frequency →</button></div><p class="small" style="color:#A9C3D0;margin:12px 0 0">Simulation tip: Begin above the expected threshold. Reduce the level in 5 dB steps until the lowest audible level is identified.</p></div>
+<div><div class="patient-card"><div class="patient-icon">🧑‍⚕️</div><div><strong>Simulated patient response</strong><span>Preset training profile · Not a real patient</span></div></div><div class="card" style="margin:0 0 14px"><div class="kicker">How to operate</div><h3 style="font-size:16px;margin:0 0 7px">Testing sequence</h3><ol class="guide-list"><li>Choose the conduction mode and ear.</li><li>Select a frequency and set the sound intensity.</li><li>Press “Present tone” to start the test.</li><li>Check the simulated patient's response.</li><li>Adjust intensity and repeat until threshold is reached.</li><li>Save the threshold and continue to the next frequency.</li></ol></div><div class="notice">Educational simulation only. It is not a calibrated clinical audiometer and cannot diagnose hearing loss.</div></div></div></section>
+<section class="card" id="readings"><div class="kicker">04 / Data collection</div><h2 class="section-title">Recorded threshold readings</h2><p class="small muted">Your saved readings appear here and are used to generate the audiogram below.</p><div class="table-wrap"><table><thead><tr><th>Frequency</th><th>Ear</th><th>Mode</th><th>Threshold</th></tr></thead><tbody id="rows"><tr><td colspan="4" class="muted">No readings recorded yet.</td></tr></tbody></table></div><div class="btn-row"><button class="btn" style="background:var(--site-primary);color:white;border:0" id="download">↓ Download CSV results</button><button class="btn" id="clear" style="background:light-dark(#EDF1F6,#29384A);color:light-dark(#34445B,#E5EDF7)">Clear readings</button></div></section>
+<section class="card" id="audiogram-section"><div class="kicker">05 / Visualization</div><h2 class="section-title">Audiogram analysis</h2><p class="small muted">Frequency is plotted horizontally and hearing threshold (dB HL) vertically. Larger threshold values appear lower on the graph.</p><div class="graph-shell"><canvas id="audiogram" width="1000" height="440" aria-label="Audiogram graph showing recorded hearing thresholds"></canvas><div class="legend"><span><i class="dot" style="background:#2878D0"></i>Right AC</span><span><i class="dot" style="background:#DF5353"></i>Left AC</span><span><i class="dot" style="background:#15966A"></i>Right BC</span><span><i class="dot" style="background:#9560C8"></i>Left BC</span></div></div></section>
+<section class="card" id="procedure"><div class="kicker">06 / Lab record</div><h2 class="section-title">Procedure</h2><ol class="guide-list"><li>Connect the headphones to the audiometer and switch on the instrument.</li><li>Select RIGHT or LEFT depending upon the ear to be tested.</li><li>Adjust the frequency dial to the required test frequency.</li><li>Present a tone at an audible level, then gradually reduce its intensity.</li><li>Identify and record the lowest level at which the subject hears the tone.</li><li>Repeat the test at different frequencies and verify the response.</li><li>For bone conduction, connect the bone vibrator and select BC. Test up to 4000 Hz.</li><li>Plot the recorded thresholds on the audiogram.</li></ol><div class="result-band" style="margin-top:16px"><div class="kicker">Experiment result</div><b>The hearing thresholds are assessed using air and bone conduction methods and plotted on an audiogram.</b><p class="small muted" id="progress" style="margin-bottom:0">No measurements have been recorded yet.</p></div></section>
+</main><footer>VIRTUAL BIOMEDICAL LABORATORY · AUDIOGRAM EXPERIMENT 05 · LEARNING SIMULATION</footer>
+</div>
+<script>
+(()=>{
+const $=id=>document.getElementById(id),frequencies=[250,500,1000,2000,4000,8000];
+const simulated={Right:{AC:[20,15,20,25,30,25],BC:[10,10,15,15,20]},Left:{AC:[25,20,25,30,35,30],BC:[15,15,20,20,25]}};
+let data=[],presented=false,heard=false;
+const mode=()=>$('mode').value,ear=()=>$('ear').value,freq=()=>+$('frequency').value,level=()=>+$('intensity').value;
+function threshold(){return simulated[ear()][mode()][frequencies.indexOf(freq())]}
+function reset(msg){presented=false;heard=false;$('respond').disabled=true;$('record').disabled=true;$('status').textContent=msg}
+function update(){if(mode()==='BC'&&freq()>4000)$('frequency').value='4000';[...$('frequency').options].forEach(o=>o.disabled=mode()==='BC'&&+o.value>4000);$('freqDisplay').textContent=freq();$('levelDisplay').textContent=level();$('levelText').textContent=level()+' dB HL';$('wavePath').style.opacity=String(.35+((level()+10)/110)*.65);$('wavePath').style.stroke=mode()==='AC'?'#72E2CB':'#C4A8FF'}
+function draw(){const c=$('audiogram'),ctx=c.getContext('2d'),W=c.width,H=c.height,L=82,R=28,T=25,B=62,pw=W-L-R,ph=H-T-B,y=v=>T+v/100*ph;ctx.clearRect(0,0,W,H);ctx.font='15px Arial';ctx.strokeStyle=getComputedStyle(document.body).color.includes('')?'#8796A8':'#8796A8';ctx.lineWidth=1;ctx.fillStyle='#8290A3';for(let v=0;v<=100;v+=10){ctx.beginPath();ctx.moveTo(L,y(v));ctx.lineTo(W-R,y(v));ctx.strokeStyle='#8492A322';ctx.stroke();ctx.fillText(v,L-35,y(v)+5)}frequencies.forEach((f,i)=>{let x=L+i*pw/5;ctx.beginPath();ctx.moveTo(x,T);ctx.lineTo(x,H-B);ctx.strokeStyle='#8492A322';ctx.stroke();ctx.fillText(f>=1000?(f/1000)+'k':f,x-14,H-B+26)});ctx.fillStyle='#64748B';ctx.fillText('Hearing threshold (dB HL)',L,T-8);ctx.fillText('Frequency (Hz)',W/2-40,H-12);let colors={'Right-AC':'#2878D0','Left-AC':'#DF5353','Right-BC':'#15966A','Left-BC':'#9560C8'};Object.entries(colors).forEach(([key,color])=>{let pts=data.filter(d=>d.ear+'-'+d.mode===key).sort((a,b)=>a.freq-b.freq);if(!pts.length)return;ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=3;ctx.beginPath();pts.forEach((p,i)=>{let x=L+frequencies.indexOf(p.freq)*pw/5;if(i===0)ctx.moveTo(x,y(p.value));else ctx.lineTo(x,y(p.value))});ctx.stroke();pts.forEach(p=>{let x=L+frequencies.indexOf(p.freq)*pw/5;ctx.beginPath();ctx.arc(x,y(p.value),7,0,Math.PI*2);ctx.fill()})})}
+function render(){$('rows').innerHTML=data.length?data.map(d=>`<tr><td>${d.freq} Hz</td><td>${d.ear}</td><td>${d.mode}</td><td><b>${d.value} dB HL</b></td></tr>`).join(''):'<tr><td colspan="4" class="muted">No readings recorded yet.</td></tr>';$('progress').textContent=data.length+' threshold reading(s) recorded. '+(data.length>=20?'The audiogram now contains a broad set of measurements.':'Continue testing both ears and both conduction modes.');draw()}
+$('mode').onchange=()=>{reset('Conduction mode changed. Present a new tone.');update()};$('ear').onchange=()=>reset('Test ear changed. Present a new tone.');$('frequency').onchange=()=>{reset('Frequency changed. Present a new tone.');update()};$('intensity').oninput=()=>{reset('Intensity changed. Present the tone again.');update()};$('down').onclick=()=>{$('intensity').value=Math.max(-10,level()-5);$('intensity').oninput()};$('up').onclick=()=>{$('intensity').value=Math.min(100,level()+5);$('intensity').oninput()};
+$('play').onclick=()=>{presented=true;heard=false;$('respond').disabled=false;$('record').disabled=true;$('status').textContent='🔊 Tone presented: '+freq()+' Hz at '+level()+' dB HL. Check the simulated patient response.'};$('respond').onclick=()=>{if(!presented)return;heard=level()>=threshold();$('status').textContent=heard?'✓ Simulated patient heard the tone. Reduce intensity in 5 dB steps to locate the threshold.':'✕ Simulated patient did not hear the tone. Increase intensity and try again.';$('record').disabled=!heard};$('record').onclick=()=>{if(!heard)return;let d={freq:freq(),ear:ear(),mode:mode(),value:level()},i=data.findIndex(x=>x.freq===d.freq&&x.ear===d.ear&&x.mode===d.mode);if(i>=0)data[i]=d;else data.push(d);reset('Threshold reading saved.');render()};$('next').onclick=()=>{let fs=frequencies.filter(f=>mode()==='AC'||f<=4000),i=fs.indexOf(freq());$('frequency').value=fs[(i+1)%fs.length];$('intensity').value=50;update();reset('Next frequency selected. Present a new tone.')};$('clear').onclick=()=>{data=[];reset('All recorded readings cleared.');render()};$('download').onclick=()=>{if(!data.length){$('status').textContent='Record readings before downloading.';return}let csv='Frequency (Hz),Ear,Mode,Threshold (dB HL)\n'+data.map(d=>[d.freq,d.ear,d.mode,d.value].join(',')).join('\n'),url=URL.createObjectURL(new Blob([csv],{type:'text/csv'})),a=document.createElement('a');a.href=url;a.download='Audiometer_Virtual_Lab_Results.csv';a.click();URL.revokeObjectURL(url)};
+update();render();
+})();
+</script>
+</body>
+</html>
